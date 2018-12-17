@@ -62,6 +62,13 @@
 
 
 ;; to do: Now you just need some more functions to generate selectors. But just as you don't want to have 
+(defun where (&key title artist rating (ripped nil ripped-p))
+  #'(lambda (cd)
+  (and
+   (if title (equal (getf cd :title) title) t)
+   (if artist (equal (getf cd :artist) artist) t)
+   (if rating (equal (getf cd :rating) rating) t)
+   (if rating (equal (getf cd :ripped) ripped) t))))
 
 
 
