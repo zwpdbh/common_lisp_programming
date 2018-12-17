@@ -22,13 +22,46 @@
   (make-cd
    (prompt-read "Title")
    (prompt-read "Artist")
-   (prompt-read "Rating")
-   (prompt-read "Ripped [y/n]")))
-
-;; next line to read: "That's almost right. Except prompt-read returns a string,"
+   (or (parse-integer (prompt-read "Rating") :junk-allowed t) 0)
+   (y-or-n-p "Ripped [y/n]: ")))
 
 
 
+;; loops until the user is done
+(defun add-cds ()
+  (loop (add-record (prompt-for-cd))
+     (if (not (y-or-n-p "Another? [y/n]")) (return))))
+
+;; save the current state of database
+(defun save-db (filename)
+  (with-open-file (out filename
+		       :direction :output
+		       :if-exists :supersede)
+    (with-standard-io-syntax
+	(print *db* out))))
+
+;; load the database back
+(defun load-db (filename)
+  (with-open-file (in filename)
+    (with-standard-io-syntax
+      (setf *db* (read in)))))
+
+;; the anonymous function contains code that won't run until it is invoked in REMOVE-IF-NOT.
+;; (defun select-by-artist (artist)
+;;   (remove-if-not
+;;    #'(lambda (cd) (equal (getf cd :artist) artist))
+;;    *db*
+;;    ))
+
+;; a more general select function which taks a function as an argument
+(defun select (selector-fn)
+  (remove-if-not selector-fn *db*))
+;; wrap up the creation of the anonymous function 
+(defun artist-selector (artist)
+  #'(lambda (cd) (equal (getf cd :artist) artist)))
+
+
+;; to do: Now you just need some more functions to generate selectors. But just as you don't want to have 
 
 
 
