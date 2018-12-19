@@ -46,22 +46,17 @@
     (with-standard-io-syntax
       (setf *db* (read in)))))
 
-;; the anonymous function contains code that won't run until it is invoked in REMOVE-IF-NOT.
-;; (defun select-by-artist (artist)
-;;   (remove-if-not
-;;    #'(lambda (cd) (equal (getf cd :artist) artist))
-;;    *db*
-;;    ))
 
-;; a more general select function which taks a function as an argument
-(defun select (selector-fn)
-  (remove-if-not selector-fn *db*))
+
 ;; wrap up the creation of the anonymous function 
 (defun artist-selector (artist)
   #'(lambda (cd) (equal (getf cd :artist) artist)))
 
+;; a more general select function which taks a function as an argument
+(defun select (selector-fn)
+  (remove-if-not selector-fn *db*))
 
-;; to do: Now you just need some more functions to generate selectors. But just as you don't want to have 
+;; This function returns an anonymous function that returns the logical AND of one clause per field in our CD records.
 (defun where (&key title artist rating (ripped nil ripped-p))
   #'(lambda (cd)
   (and
