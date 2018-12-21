@@ -48,15 +48,15 @@
 
 
 
-;; wrap up the creation of the anonymous function 
-(defun artist-selector (artist)
-  #'(lambda (cd) (equal (getf cd :artist) artist)))
-
 ;; a more general select function which taks a function as an argument
 (defun select (selector-fn)
   (remove-if-not selector-fn *db*))
 
-;; This function returns an anonymous function that returns the logical AND of one clause per field in our CD records.
+;; wrap up the creation of the anonymous function 
+(defun artist-selector (artist)
+  #'(lambda (cd) (equal (getf cd :artist) artist)))
+
+;; This function returns an anonymous function that returns the logical AND of one clause per field in our CD records. It returns a selector-fn which combines the four fields
 (defun where (&key title artist rating (ripped nil ripped-p))
   #'(lambda (cd)
   (and
@@ -65,5 +65,19 @@
    (if rating (equal (getf cd :rating) rating) t)
    (if rating (equal (getf cd :ripped) ripped) t))))
 
+;; similar, use a passed-in selector function to choose the records to update
+;; and using keyword arguments to specfiy the values to change.
+(defun update (selector-fn &key title artist rating (ripped nil ripped-p))
+  (seft *db*
+	(mapcar
+	 #'(lambda (row)
+	     (when (funcall selector-fn row)
+	       (if title (setf (getf row :title) title))
+	       (if artist (setf (getf row :artist) artist))
+	       (if rating (setf (getf row :rating) rating))
+	       (if ripped-p (setf (getf row :ripped) ripped)))
+	     row)
+	 *db*)))
 
+;; Removing Duplication and Winning big
 
