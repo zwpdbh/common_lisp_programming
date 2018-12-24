@@ -80,4 +80,20 @@
 	 *db*)))
 
 ;; Removing Duplication and Winning big
+;; (defun make-comaprison-expr (filed value)
+;;   (list 'equal (list 'getf 'cd file) value))
+;; Or, what you'd really like is a way to write an expresion that's mostly not evaluated and then have some way to pick out a few expressions that you do want evaluated. 
+(defun make-comaprison-expr (filed value)
+  `(equal (getf cd ,filed) ,value))
+;; Assume the arguments to the where macro to be passed a a single list.
+;; Then, ou need a function that take the elements of such a list pairwise and 
+;; collect the results of calling make-comparison-expr on each pair.
+(defun make-comparison-list (fields)
+  (loop while fields
+       collecting (make-comaprison-expr (pop fields) (pop fields))))
+
+;; our new-where
+(defmacro new-where (&rest clauses)
+  `#'(lambda (cd) (and ,@ (make-comparison-list clauses))))
+
 
