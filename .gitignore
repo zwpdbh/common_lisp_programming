@@ -2,7 +2,7 @@
 *
 # Now, whitelist directory you wanted
 !ch03/
-!ch04
+!ch04/
 # And all the file types you're interested in.
 !*.lisp
 
