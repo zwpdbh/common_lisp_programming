@@ -1,3 +1,10 @@
-**/*
-!.gitignore
-!**/*.lisp
+# First, ignore everything
+*
+# Now, whitelist directory you wanted
+!ch03/
+!ch04
+# And all the file types you're interested in.
+!*.lisp
+
+# Add all the files within the org-html-themes
+#!org-html-themes/*.*
