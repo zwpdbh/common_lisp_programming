@@ -124,4 +124,52 @@
    (test-+)
    (test-*)))
 
-;; An abstraction Emerges
+;; An abstraction Emerges, need a complete abstraction
+;; Express "this is a test function"
+(defmacro deftest (name parameters &body body)
+  `(defun ,name ,parameters
+     (let ((*test-name* ',name))
+       ,@body)))
+; now you could rewrite test-+ as:
+(deftest test-+ ()
+  (check
+    (= (+ 1 2) 3)
+    (= (+ 1 2 3) 6)
+    (= (+ -1 -3) -4)))
+
+
+;; A hierarchy of tests, want a "fully qualified" path, like:
+;; pass ... (TEST-ARITHMETIC TEST-+): (= (+ 1 2) 3)
+;; To make *test-name* hold a list of test function names instead 
+;; of just the name of the most recently entered test function
+;; from (let ((*test-name* ',name))
+;; to (let ((*test-name* (append *test-name* (list ',name))))
+
+(defmacro deftest (name parameters &body body)
+  `(defun ,name ,parameters
+     (let ((*test-name* (append *test-name* (list ',name))))
+       ,@body)))
+; now you could rewrite test-+ as:
+(deftest test-+ ()
+  (check
+    (= (+ 1 2) 3)
+    (= (+ 1 2 3) 6)
+    (= (+ -1 -3) -4)))
+
+(deftest test-arithmetic ()
+  (combine-results
+   (test-+)
+   (test-*)))
+
+
+;; summary
+;; 1) just AND a bunch of boolean expressions and find out if they all returned true
+;; write some simpleminded code, chock-full of duplication 
+;; 2) wirte report-result 
+;; 3) find out it is tedious and error-prone since you had to pass the test expression twice, once for the value and once as quoted data.
+;; 4) so write check macro 
+;; 5) modify check to enhance it
+;; 6) What if--you fantasized--there was already a non-short-circuiting AND construct. So, you 
+;; write combine-result macro 
+;; 7) you realize some functions represent a special category of function that deserved its own abstraction
+;; so, you write deftest
