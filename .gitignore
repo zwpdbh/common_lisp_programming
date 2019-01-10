@@ -5,6 +5,8 @@
 !ch04/
 !ch06/
 !ch07/
+!ch08/
+!ch09/
 # And all the file types you're interested in.
 !*.lisp
 
