@@ -1,0 +1,44 @@
+* Chapter 02
+** Global Variable
+   - A variable that is defined globally in Lisp is called a top-level definition.
+     #+BEGIN_SRC lisp
+       (defparameter *big* 100)
+       (defparameter *small* 1)
+     #+END_SRC
+
+     #+RESULTS:
+     : *SMALL*
+
+     #+END_SRC
+** Basic Lisp Eitquette
+   - spaces and line breaks are completely ignored when Lisp reads in your 
+** Defining Global Functions in Lisp
+   - Defining the guess-my-number Function
+     #+BEGIN_SRC lisp
+       (defun guess-my-number ()
+	 (ash (+ *small* *big*) -1))
+     #+END_SRC
+
+     #+RESULTS:
+     : GUESS-MY-NUMBER
+
+   - Every command in Common Lisp generates a return value
+     - The 'defun'
+   - "ash" is commonly used for binary searches in Lisp. It looks at a number in binary form, and then shifts its binary bits to the left or right, dropping any bits lost in the process.
+     - +1 means shift bits to left.
+     - -1 means shift bits to right, half the integer.
+*** Defining the smaller and bigger functions
+    #+BEGIN_SRC lisp
+      (defun smaller ()
+	(setf *big* (1- (guess-my-number)))
+	(guess-my-number))
+
+      (defun bigger ()
+	(setf *small* (1+ (guess-my-number)))
+	(guess-my-number))
+    #+END_SRC
+
+    #+RESULTS:
+    : BIGGER
+
+P27
