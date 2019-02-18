@@ -1,0 +1,17 @@
+* Ch16 Object Reorientation
+  - the form of DEFMETHOD is even more like that of DEFUN than DEFGENERIC's is. The only difference is that the required parameters can be specialized by replacing the parameter name with a two-element list
+    #+BEGIN_SRC lisp
+      (defgeneric withdraw (account amount)
+	(:documentation "Withdraw the specified amount from the account.
+      Signal an error if the current balance is less than amount."))
+
+      (defmethod withdraw ((account bank-account) amount)
+	(when (< (balance account) amount)
+	  (error "Account overdrawn."))
+	(decf (balance account) amount))
+    #+END_SRC
+    - The first element is the name of the parameter
+    - The second element is the specializer
+      - It could be the name of a class
+      - or an EQL specializer
+
