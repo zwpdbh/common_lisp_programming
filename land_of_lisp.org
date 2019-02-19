@@ -41,4 +41,244 @@
     #+RESULTS:
     : BIGGER
 
-P27
+*** Define the start-over function
+    #+BEGIN_SRC lisp
+      (defun start-over ()
+	(defparameter *small* 1)
+	(defparameter *big* 100)
+	(guess-my-number))
+    #+END_SRC
+
+** Defining Local Variables in Lisp
+   To limit your definition to a single function or a block of code, you need to define local variable
+   - use 'let'
+     #+BEGIN_SRC lisp
+       (let (variable declarations)
+	 ...body...)
+
+       (let ((a 5)
+	     (b 6))
+	 (+ a b)) ; = 11
+     #+END_SRC
+
+** Defining Local Function in Lisp
+   #+BEGIN_SRC lisp
+     (flet ((f (n)
+	      (+ n 10)))
+       (f 5))
+   #+END_SRC
+
+   #+RESULTS:
+   : 15
+   - As with let, you can define one or more functions within the scope of the flet
+   #+BEGIN_SRC lisp
+     (flet (
+	    (f (n)
+	      (+ n 10))
+	    (g (n)
+	      (- n 3)))
+       (g (f 5)))
+   #+END_SRC
+
+   #+RESULTS:
+   : 12
+   
+   - To make function names available in defined functions, we can use the labels command, its structure is similar to the flet command
+     #+BEGIN_SRC lisp
+       (labels (
+		(f (n)
+		  (+ n 10))
+		(g (n)
+		  (+ (f n) 6)))
+	 (g 10))
+     #+END_SRC
+
+     #+RESULTS:
+     : 26
+
+*** Summary
+    - define a glabal variable
+      - defparameter
+      - defvar
+    - define a global function
+      - defun
+    - define local variable
+      - let
+    - set value
+      - setf
+    - define local functions
+      - flet
+      - labels (the defined function could call itself, recursively)
+
+
+* Ch03 Exploring the syntax of lisp code
+** The Building Block of Lisp Syntax
+   - Symbols
+     #+BEGIN_SRC lisp
+       (eq 'fool 'FoOL)
+     #+END_SRC
+
+     #+RESULTS:
+     : T
+
+   - Numbers
+   - Strings
+     - To indicate a string in Lisp, surround characters with double quotes.
+     - Use "princ" to display a string
+       #+BEGIN_SRC lisp
+	 (princ "Hello World")
+       #+END_SRC
+
+       #+RESULTS:
+       : Hello World
+
+** How Lisp Distinguishes Between Code and Data
+   How does lisp decide which parts of your program consist of code (stuff to be executed) and which parts are just data?
+
+*** Code Mode
+    - code should be in a special type of list: a form
+      - A form is simply a slit with a special command at the beginning, typically the name of a function.
+
+*** Data Mode
+    - By placing a quote in front of lists, you are telling lisp: "This next part isn't a command. It is just a chunk of data for my program". This is called quoting.
+
+** Lists in Lisp
+   You can think of a Lisp program as a house. If you were to build a house in Lisp, your walls would be made out of lists. The bricks would be made out of symbols, numbers, and strings. And like wall needs mortar to hold it together, lists in Lisp are hold together by structures called cons cells.
+
+*** Cons Cells and List Functions
+    - The cons Function
+      If you want to link any two pieces of data in your Lisp program, you can do that with cons function. When you call cons, the Lisp compiler typically allocates a small chunk of memory, the cons cell that can hold two references to the objects being linked.
+      #+BEGIN_SRC lisp
+	(cons 'zw 'pdbh)
+      #+END_SRC
+
+      #+RESULTS:
+      : (ZW . PDBH)
+      The dot between the two connected item make this a cons cell. Do not confuse this with a regular list, it just links those two items together.
+      
+*** The car and cdr Functions
+    #+BEGIN_SRC lisp
+      (car '(zw pd bh))
+      (cdr '(zw pd bh))
+    #+END_SRC
+
+*** The list function
+    The following 3 are the same:
+    #+BEGIN_SRC lisp
+      (cons 'pork (cons 'beef (cons 'chicken)))
+      (list 'pork 'beef 'chicken)
+      '(pork beef chicken)
+    #+END_SRC
+*** Summary
+    - Lists are created from cons cells
+    - You can create lists by making cons cells with the cons command.
+    - Inspect the pieces of a list with car and cdr.
+
+
+* Ch04 Making Decisions With Conditions
+** The symmetry of nil and ()
+*** Empty Euals False
+    - empty list == false, non-empty list == true
+    - Because we can easily detect anempty list, we can process lists using recursion.
+      #+BEGIN_SRC lisp
+	(defun my-length (list)
+	  (if list
+	      (1+ (my-length (cdr list)))
+	      0))
+
+	(my-length '(a b c d e f g))
+      #+END_SRC
+
+      #+RESULTS:
+      : 7
+      
+*** THe four disguises of ()
+    - Not only does the empty list evaluate to false, but it is the only false value in common lisp.
+      Any value not equivalent to an empty list will be considered a true value.
+    - These four are all equivalent
+      - '()
+      - ()
+      - 'nil
+      - nil
+
+** The conditionals: if and beyond
+*** One thing at a time with If
+    - only one of the expression after the if is actually evaluated
+    - only do one thing in an if statement
+    - Usually, when a function is executed in lisp, all the expressions after the function name are evaluated, before the function itself is evaluated. However, if does not follow these rules.
+      'IF' is a special form, which gives it special previleges, such as the right to not evaluated all its parameters in the normal way. 
+      Conditional commands in Lisp are typically special forms.
+    - Use 'progn' to wedge extra commands in a single expression. With progn, only the last evaluation is returned as the value of the full expression.
+
+*** Going Beyond if: The when and unless Alternatives
+    SInce it's kind of a pain to use progn every time you want to do multiple things inside an if. Lisp has several other commands that include an implicit progn.
+    - when
+      #+BEGIN_SRC lisp
+	(defvar *number-is-odd* nil)
+	(when (oddp 5)
+	  (setf *number-is-odd* t)
+	  'odd-number)
+      #+END_SRC
+
+      #+RESULTS:
+      : ODD-NUMBER
+  
+    - unless, which is the oppisite of when
+
+*** The Command That Does It All: cond
+    #+BEGIN_SRC lisp
+      (defvar *arch-empty* nil)
+      (defun pudding-eater (person)
+	(cond
+	  ((eq person 'henry)
+	   (setf *arch-empty* 'stupid-lisp-alien)
+	   '(curse you lisp alien - you ate my pudding))
+	  ((eq person 'johnny)
+	   (setf *arch-empty* 'useless-old-johnny)
+	   '(I hope you choked on my pudding johnny))
+	  (t '(why you eat my pudding stranger?))))
+    #+END_SRC
+
+    #+RESULTS:
+    : PUDDING-EATER
+
+    - The cond form is the classic way to do branching in Lisp.
+    - The body of a cond uses a layer of parentheses to separate the different branches of the condition.
+    - 't' guaranteeing that at least the last brach will always be evaluated. Just like 'else'.
+
+*** Braching with case
+    Because the case command uses eq for comparisions, it is usually used only for branching on SYMBOL. It cannot be used to branch on string values, among other things. 
+    #+BEGIN_SRC lisp
+      (defun pudding-eater (person)
+	(case person
+	  ((henry) (setf *arch-empty* 'stupid-lisp-alien)
+	   '(curse you lisp alien - you ate my pudding))
+	  ((johnny) (setf *arch-empty* 'useless-old-johnny)
+	   '(I hope you choked on my pudding johnny))
+	  (otherwise '(why you eat my pudding stranger?))))
+    #+END_SRC
+
+    #+RESULTS:
+    : PUDDING-EATER
+      
+** Cool Thricks with Conditions
+*** Using the stealth Conditionals and 'and', 'or' 
+*** Using Funcitons that Return More than Just the Truth
+    - Whenever a Lisper writes a function that returns true and false, she will think to herself, "Is there anything else I could return other than just t" Since all non-nil values in Common Lisp evaluate to true, return some other value is essentially a freebie.
+ 
+** Comparing Stuff: eq, equal, and More
+   - eq, Symbols should always be compared to other symbols with EQ.
+   - equal, If you are not dealing with two symbols, just use EQUAL. It will tell you when two things are isomorphic, meaning they "look the same".
+   - eql, similar to eq, but also handles comparisions of numbers and characters.
+   - equalp, same as equal but with a bit of extra sophistication.
+
+** Summary
+   - nil, 'nil, (), '()
+   - Lisp conditional
+     - if
+     - when
+     - unless
+     - cond
+   - comparison
+     - eq
+     - equal
