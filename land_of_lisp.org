@@ -282,3 +282,44 @@
    - comparison
      - eq
      - equal
+
+* Building a text game engine
+  Handling text is not a computer's strength. It is necessary evial best kep to a minimum.
+
+** Describing the scenery with an Association list
+   The world inside our adventure game is very simple, containing only three location. Let define a global variable which contains a list and description of our 3 locations. It basically gives us a way to find a piece of data associated with a lookup key. This type of structure is called an association list, or alist.
+   #+BEGIN_SRC lisp
+     (defparameter *node* '((living-room (you are in the living-room. A wizard is snoring loudly on the couch))
+			    (garden (you are in a beautiful garden. there is a well in front of you))
+			    (attic (you are in the attic. there is a giant welding torch in the corner.))))
+   #+END_SRC
+
+   #+RESULTS:
+   : *NODE*
+   Using lists and symbols as an intermediary for manipulating text is an old-school Lisp technique. However, it can often lead to very elegant code, since lisp and symbol operations are so fundamental to lisp.
+   most experienced Lispers will try to focus on these datatypes in the design of their software whenever possible.
+   
+** Describing the Location
+   - use assoc function to find the correct item in the alist
+     #+BEGIN_SRC lisp
+       (assoc 'garden *node*)
+     #+END_SRC
+
+     #+RESULTS:
+     | GARDEN | (YOU ARE IN A BEAUTIFUL GARDEN. THERE IS A WELL IN FRONT OF YOU) |
+     
+   - With assoc, we can easily create the describe-location function
+     #+BEGIN_SRC lisp
+       (defun describe-location (location nodes)
+	 (cadr (assoc location nodes)))
+       (describe-location 'living-room *node*)
+     #+END_SRC
+
+     #+RESULTS:
+     | YOU | ARE | IN | THE | LIVING-ROOM. | A | WIZARD | IS | SNORING | LOUDLY | ON | THE | COUCH |
+   - Functional programming style
+     - A function will reference only parameters or variables declared in the function itself. And it will do nothing besides return a value.
+     - By writing functions that don't reference variables in the "outside world" directly and that don't perform any actions other than returning a value, you can write code that can easily be tested in isolation.
+
+** Describing the Paths
+   We now need descriptions of paths to other location. We will create a second global variable that contains the paths that players can take to move between places on our map.
