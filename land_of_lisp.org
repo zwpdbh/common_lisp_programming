@@ -323,3 +323,115 @@
 
 ** Describing the Paths
    We now need descriptions of paths to other location. We will create a second global variable that contains the paths that players can take to move between places on our map.
+   #+BEGIN_SRC lisp
+     (defparameter *edge* '((living-room (garden west door) (attic upstairs ladder))
+			    (garden (living-room east door))
+			    (attic (living-room downstairs ladder))))
+   #+END_SRC
+
+   #+RESULTS:
+   : *EDGE*
+
+   Then, use this structure to create the describe-path function which builds a textual description of a given edge using our symbols system.
+   #+BEGIN_SRC lisp
+     (defun describe-edge (edge)
+       `(there is a ,(caddr edge) going ,(cadr edge) from here.))
+     ;; notice the ` not '
+     (describe '(garden west door))
+   #+END_SRC
+
+   #+RESULTS:
+
+*** Describing multiple path as Once
+    It could generate descriptions for all edges from a given location by looking up the location from our data structure of edges:
+    #+BEGIN_SRC lisp
+      (defun describe-edges (location edges)
+	(apply #'append (mapcar #'describe-edge (cdr (assoc location edges)))))
+      (describe-edges 'living-room *edge*)
+    #+END_SRC
+
+    #+RESULTS:
+    | THERE | IS | A | DOOR | GOING | WEST | FROM | HERE. | THERE | IS | A | LADDER | GOING | UPSTAIRS | FROM | HERE. |
+
+    - HIGH order function, 'mapcar'
+      #+BEGIN_SRC lisp
+	(mapcar #'sqrt '(1 2 3 4 5))
+      #+END_SRC
+
+      #+RESULTS:
+      | 1.0 | 1.4142135 | 1.7320508 | 2.0 | 2.236068 |
+      This function takes another function and a list, and then applies this function to every member of a list. The function names we pass into mapcar have the #' symbols, which is shorthand for the function operator.
+
+*** Joining the Descriptions
+    It joins several lists into one big list.
+    #+BEGIN_SRC lisp
+      (append '(zw) '(pd) '(b) '(h))
+    #+END_SRC
+
+    #+RESULTS:
+    | ZW | PD | B | H |
+    A problem of append is that it need each list to be separated list marked seperated using ', to solve this we could use apply.
+    #+BEGIN_SRC lisp
+      (apply #'append '((1 2) (3) (4 5 6)))
+    #+END_SRC
+
+    #+RESULTS:
+    | 1 | 2 | 3 | 4 | 5 | 6 |
+
+
+** Describing Objects at a Specific Location
+*** Listing visible objects
+    #+BEGIN_SRC lisp
+      (defparameter *objects* '(whiskey bucket frog chain))
+    #+END_SRC
+
+    #+RESULTS:
+    : *OBJECTS*
+    
+    Also create a second variable to track the location of each object in the form of an alist:
+    #+BEGIN_SRC lisp
+      (defparameter *object-locations* '((whiskey living-room)
+					 (bucket living-room)
+					 (chain garden)
+					 (frog garden)))
+    #+END_SRC
+
+    #+RESULTS:
+    : *OBJECT-LOCATIONS*
+
+    A function that lists the objects visiable from a given location:
+    #+BEGIN_SRC lisp
+      (defun objects-at (loc objs obj-locs)
+	;; use labels to define local function
+	(labels ((at-loc-p (obj)
+		   (eq (cadr (assoc obj obj-locs)) loc)))
+	  ;; remove all things from a list for which a passed-in function doesn't return true.
+	  (remove-if-not #'at-loc-p objs)))
+      ;; the result of this function returns a filtered list of objects consisting of those items for which at-loc-p is true
+
+      (objects-at 'living-room *objects* *object-locations*)
+    #+END_SRC
+
+    #+RESULTS:
+    | WHISKEY | BUCKET |
+    
+    "xxx-p" function name means it is boolean function, p stands for predicates.
+
+*** Describing Visible Objects
+    Now, we could write a function to describe the objects visible at a given location.
+    #+BEGIN_SRC lisp
+      (defun describe-objects (loc objs obj-loc)
+	(labels ((describe-obj (obj)
+		   `(you see a ,obj on the floor.)))
+	  (apply #'append (mapcar #'describe-obj (objects-at loc objs obj-loc)))))
+
+      (describe-objects 'living-room *objects* *object-locations*)
+    #+END_SRC
+
+    #+RESULTS:
+    | YOU | SEE | A | WHISKEY | ON | THE | FLOOR. | YOU | SEE | A | BUCKET | ON | THE | FLOOR. |
+
+
+** Describing It All
+   Now we tie all of these description functions into one easy command called look.
+   
