@@ -334,18 +334,21 @@
 
    Then, use this structure to create the describe-path function which builds a textual description of a given edge using our symbols system.
    #+BEGIN_SRC lisp
-     (defun describe-edge (edge)
+     (defun describe-path (edge)
        `(there is a ,(caddr edge) going ,(cadr edge) from here.))
      ;; notice the ` not '
-     (describe '(garden west door))
+     ;; caddr is the third element in the list
+     ;; cadddr is the fourth element in the list
+     (describe-path '(garden west door))
    #+END_SRC
 
    #+RESULTS:
+   | THERE | IS | A | DOOR | GOING | WEST | FROM | HERE. |
 
 *** Describing multiple path as Once
     It could generate descriptions for all edges from a given location by looking up the location from our data structure of edges:
     #+BEGIN_SRC lisp
-      (defun describe-edges (location edges)
+      (defun describe-paths (location edges)
 	(apply #'append (mapcar #'describe-edge (cdr (assoc location edges)))))
       (describe-edges 'living-room *edge*)
     #+END_SRC
@@ -434,4 +437,60 @@
 
 ** Describing It All
    Now we tie all of these description functions into one easy command called look.
+   #+BEGIN_SRC lisp
+     (defparameter *location* 'living-room)
+     (defun look ()
+       (append (describe-location *location* *node*)
+	       (describe-paths *location* *edge*)
+	       (describe-objects *location* *objects* *object-locations*)))
+   #+END_SRC
+
+   #+RESULTS:
+   : LOOK
    
+** Waling Around in Our World
+   Walk function takes a direction and lets us walk there
+   #+BEGIN_SRC lisp
+     (defun walk (direction)
+       (let ((next (find direction
+			 (cdr (assoc *location* *edge*))
+			 :key #'cadr)))
+	 (if next
+	     (progn
+	       (setf *location* (car next))
+	       (look))
+	     '(you cannot go that way.))))
+   #+END_SRC
+
+   #+RESULTS:
+   : WALK
+
+** Picking up Objects
+   #+BEGIN_SRC lisp
+     (defun pickup (object)
+       (cond ((member object (objects-at *location* *objects* *object-locations*))
+	      (push (list object 'body) *object-locations*)
+	      `(you are now carrying the ,object))
+	     (t '(you cannot get that.))))
+   #+END_SRC
+
+   #+RESULTS:
+   : PICKUP
+
+
+** Checking Our Inventory
+   Create a function that lets players see an inventory of objects they are carring:
+   #+BEGIN_SRC lisp
+     (defun inventory ()
+       (cons 'items- (objects-at 'body *objects* *object-locations*)))
+   #+END_SRC
+
+   #+RESULTS:
+   : INVENTORY
+
+** Summary
+   - association list, alist
+   - assoc, to look up a key
+   - Quasiguoting is a technique that allows you to insert small bits of computer code into larger pieces of ata.
+   - high-order function, which is the function accpet other functions as arguments.
+   - To replace a value from an alist, you push new items onto the list. Only the most recent value will be reported by the "assoc" function.
