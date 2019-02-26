@@ -7,8 +7,9 @@
 !ch07/
 !ch08/
 !ch09/
+!land_of_lisp/
 # And all the file types you're interested in.
 !*.lisp
-
+!*.org
 # Add all the files within the org-html-themes
 #!org-html-themes/*.*
