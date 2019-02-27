@@ -1,0 +1,28 @@
+* Chapter 06
+** Printing and Reading Text
+   - print
+   - prin1
+   - read
+   - To create a lisp character, just place the #\ symbols in front of the actual character.
+   - Some important for every day use
+     - #\newline
+     - #\tab
+     - #\space
+   - the cool thing about the print command is that it prints objects in such a way that they can always be ¡°read¡± back into their internal representation
+   - There is no symmetric of thing for read, as the same as princ for print.
+     - The read-line could only work around characters and strings.
+
+** The Symmetry Between Code and Data in Lisp
+   - homoiconic, A programming language that uses the same data structure to store data and program code.
+     - Remember, code mode and data mode
+   - What if we generate a piece of lisp code from scratch some how and wish to execute it as if it were a piece of code? Use eval
+     #+BEGIN_SRC lisp
+       (defparameter *foo* '(+ 1 2))
+       (eval *foo*)
+     #+END_SRC
+
+     #+RESULTS:
+     : 3
+
+** Adding a Custome Interface to Our Game Engine
+     
