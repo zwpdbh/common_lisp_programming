@@ -15,3 +15,5 @@
       - It could be the name of a class
       - or an EQL specializer
 
+
+* Chapter 7 Going Beyongd Basic Lists

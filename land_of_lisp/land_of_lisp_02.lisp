@@ -60,3 +60,64 @@
 			     nil)
 		 'string))
   (fresh-line))
+
+;; 6.5 Lambda
+(mapcar (lambda (n) (/ n 2)) '(10 20 30))
+
+
+;; Chapter 7 Going beyong basic lists
+;; Creating a Graph
+(defparameter *wizard-nodes* '((living-room (you are in the living-room. a wizard is snoring loudly on the couch.))
+				(garden (you are in a beautiful garden. there is a well in front of you.))
+				(attic (you are in the attic. there is a giant welding torch in the corner))))
+(defparameter *wizard-edges* '((living-room (garden west door)
+				(attic upstairs ladder))
+			       (garden (living-room east door))
+			       (attic (living-room downstairs ladder))))
+
+;; converting node identifier 
+(defun dot-name (exp)
+  (substitute-if #\_ (complement #'alphanumericp) (prin1-to-string exp)))
+
+;; adding labels to graph nodes
+;; a function that specify the content of the node label
+(defparameter *max-label-length* 30)
+(defun dot-label (exp)
+  (if exp
+      (let ((s (write-to-string exp :pretty nil)))  ; it is similar with prin1-to-string, except it does not insert a #\n to the string
+	(if (> (length s) *max-label-length*)
+	    ; if the length of s is greater than 30, then concatenate its first 27 + ...
+	    (concatenate 'string (subseq s 0 (- *max-label-length* 3)) "...")
+	    s))
+      ""))
+
+;; Now we can generate both a name and label for each node.
+(defun nodes->dot (nodes)
+  (mapc (lambda (node)
+	  (fresh-line)
+	  (princ (dot-name (car node)))
+	  (princ "[label=\"")
+	  (princ (dot-label node))
+	  (princ "\"];"))
+	nodes))
+
+;; generate the DOT information for the edges that link our nodes.
+(defun edges->dot (edges)
+  (mapc (lambda (node)
+	  (mapc (lambda (edge)
+		  (fresh-line)
+		  (princ (dot-name (car node)))
+		  (princ "->")
+		  (princ (dot-name (car edge)))
+		  (princ "[label=\"")
+		  (princ (dot-label (cdr edge)))
+		  (princ "\"];"))
+		(cdr node)))
+	edges))
+
+;; Generating all the dota data
+(defun graph->dot (nodes edges)
+  (princ "digraph{")
+  (nodes->dot nodes)
+  (edges->dot edges)
+  (princ "}"))
