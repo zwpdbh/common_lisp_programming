@@ -68,8 +68,8 @@
 ;; Chapter 7 Going beyong basic lists
 ;; Creating a Graph
 (defparameter *wizard-nodes* '((living-room (you are in the living-room. a wizard is snoring loudly on the couch.))
-				(garden (you are in a beautiful garden. there is a well in front of you.))
-				(attic (you are in the attic. there is a giant welding torch in the corner))))
+			       (garden (you are in a beautiful garden. there is a well in front of you.))
+			       (attic (you are in the attic. there is a giant welding torch in the corner))))
 (defparameter *wizard-edges* '((living-room (garden west door)
 				(attic upstairs ladder))
 			       (garden (living-room east door))
@@ -86,7 +86,7 @@
   (if exp
       (let ((s (write-to-string exp :pretty nil)))  ; it is similar with prin1-to-string, except it does not insert a #\n to the string
 	(if (> (length s) *max-label-length*)
-	    ; if the length of s is greater than 30, then concatenate its first 27 + ...
+					; if the length of s is greater than 30, then concatenate its first 27 + ...
 	    (concatenate 'string (subseq s 0 (- *max-label-length* 3)) "...")
 	    s))
       ""))
@@ -121,3 +121,64 @@
   (nodes->dot nodes)
   (edges->dot edges)
   (princ "}"))
+
+
+;; turning the dot file into a picture
+(defun dot->png (fname thunk)
+  (with-open-file (*standard-output*
+		   fame
+		   :direction :output
+		   :if-exists :supersede)
+    (funcall thunk))
+  (ext:shell (concatenate 'string "dot -Tpng -O " fname)))
+
+
+;; wirting to a file
+(with-open-file (my-stream
+		 "textfile.txt"
+		 :direction :output
+		 :if-exists :supersede)
+  (princ "Hello File!" my-stream))
+
+;; a function that ties together all the pieces to let us easily create a graph from some nodes and edges
+(defun graph->png (fname nodes edges)
+  (dot->png fname
+	    (lambda ()
+	      (graph->dot nodes edges))))
+
+
+;; for undirected graph
+(defun uedges->dot (edges)
+  (maplist (lambda (lst)
+	     (mapc (lambda (edge)
+		     (unless (assoc (car edge) (cdr lst))
+		       (fresh-line)
+		       (princ (dot-name (caar lst)))
+		       (princ "--")
+		       (princ (dot-name (car edge)))
+		       (princ "[label=\"")
+		       (princ (dot-label (cdr edge)))
+		       (princ "\"];")))
+		   (cdar lst)))
+	   edges))
+
+(defun ugraph->dot (nodes edges)
+  (princ "graph{")
+  (nodes->dot nodes)
+  (uedges->dot edges)
+  (princ "}"))
+
+(defun ugraph->png (fname nodes edges)
+  (dot->png fname
+	    (lambda ()
+	      (ugraph->dot nodes edges))))
+
+(defun test-edges (edges)
+  (let ((count 0))
+    (maplist (lambda (lst)
+	       (print (length lst))
+	       (print lst)
+	       (mapc (lambda (edge)
+		       (print edge))
+		     (cdar lst)))
+	     edges)))
