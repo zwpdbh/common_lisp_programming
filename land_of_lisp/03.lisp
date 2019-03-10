@@ -64,4 +64,43 @@
   (append (connect-with-bridge (find-islands nodes edge-list)) edge-list))
 
 ;; To complete our edges for gongestion city, we need to convert the edges from an edge list into an alist.
+(defun make-city-edges ()
+  (let* ((nodes (loop for i from 1 to *node-num*
+		   collect i))
+	 (edge-list (connect-all-islands nodes (make-edge-list)))
+	 (cops (remove-if-not (lambda (x)
+				(zerop (random *cop-odds*)))
+			      edge-list)))
+    (add-cops (edges-to-alist edge-list) cops)))
 
+;; when call (edges-to-alist '((1 . 2) (2 . 1)))
+;; => ((1 (2)) (2 (1)))
+(defun edges-to-alist (edge-list)
+  (mapcar (lambda (node1)
+	    (cons node1
+		  (mapcar (lambda (edge)
+			    (list (cdr edge)))
+			  (remove-duplicates (direct-edges node1 edge-list)
+					     :test #'equal))))
+	  (remove-duplicates (mapcar #'car edge-list))))
+
+;; randomly mark some of edges to show that they have cops on them.
+;; use the list of cop edges to mark the edges in our alist that contain cops.
+;; intersection tell us whichitems are shared between two lists.
+(defun add-cops (edge-alist edges-with-cops)
+  (mapcar (lambda (x)
+	    (let ((node1 (car x))
+		  (node1-edges (cdr x)))
+	      (cons node1
+		    (mapcar (lambda (edge)
+			      (let ((node2 (car edge)))
+				(if (intersection (edge-pair node1 node2)
+						  edges-with-cops
+						  :test #'equal)
+				    (list node2 'cops)
+				    edge)))
+			    node1-edges))))
+	  edge-alist))
+
+ 
+;; Building the nodes for Congestion city
