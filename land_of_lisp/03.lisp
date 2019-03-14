@@ -73,8 +73,13 @@
 			      edge-list)))
     (add-cops (edges-to-alist edge-list) cops)))
 
+<<<<<<< HEAD
 ;; a function convert: '((1 . 2) (2 . 1) (2 . 3) (3 . 2))
 ;; to '((1 (2)) (2 (1) (3)) (3 (2)))
+=======
+;; when call (edges-to-alist '((1 . 2) (2 . 1)))
+;; => ((1 (2)) (2 (1)))
+>>>>>>> 96db7f4356c4f8b4f1feab80ba7752d5eb2e9397
 (defun edges-to-alist (edge-list)
   (mapcar (lambda (node1)
 	    (cons node1
@@ -84,10 +89,17 @@
 					     :test #'equal))))
 	  (remove-duplicates (mapcar #'car edge-list))))
 
+<<<<<<< HEAD
+=======
+;; randomly mark some of edges to show that they have cops on them.
+;; use the list of cop edges to mark the edges in our alist that contain cops.
+;; intersection tell us whichitems are shared between two lists.
+>>>>>>> 96db7f4356c4f8b4f1feab80ba7752d5eb2e9397
 (defun add-cops (edge-alist edges-with-cops)
   (mapcar (lambda (x)
 	    (let ((node1 (car x))
 		  (node1-edges (cdr x)))
+<<<<<<< HEAD
 	      (cons node1 (mapcar (lambda (edge)
 				    (let ((node2 (car edge)))
 				      (if (intersection (edge-pair node1 node2)
@@ -130,3 +142,18 @@
 			     '(lights!)))
 		      (when (some #'cdr (cdr (assoc n edge-alist)))
 			'(sirens!))))))
+=======
+	      (cons node1
+		    (mapcar (lambda (edge)
+			      (let ((node2 (car edge)))
+				(if (intersection (edge-pair node1 node2)
+						  edges-with-cops
+						  :test #'equal)
+				    (list node2 'cops)
+				    edge)))
+			    node1-edges))))
+	  edge-alist))
+
+ 
+;; Building the nodes for Congestion city
+>>>>>>> 96db7f4356c4f8b4f1feab80ba7752d5eb2e9397
