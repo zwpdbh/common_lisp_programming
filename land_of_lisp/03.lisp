@@ -3,6 +3,7 @@
 
 (defparameter *congestion-city-nodes* nil)
 (defparameter *congestion-city-edges* nil)
+(defparameter *player-pos* nil)
 (defparameter *visted-nodes* nil)
 (defparameter *node-num* 30)
 (defparameter *edge-num* 40)
@@ -137,3 +138,21 @@
 
 
 
+;; Initialize a new Gave of grand theft wumpus
+(defun new-game ()
+  (setf *congestion-city-edges* (make-city-edges))
+  (setf *congestion-city-nodes* (make-city-nodes *congestion-city-edges*))
+  (setf *player-pos* (find-empty-node))
+  (setf *visited-nodes* (list *player-pos*))
+  (draw-city))
+
+;; ensures that the player doesn't end up on top of a bad guy right 
+;; at the beginning of the game
+(defun find-empty-node ()
+  (let ((x (random-node)))
+    (if (cdr (assoc x *congestion-city-nodes*))
+	(find-empty-node)
+	x)))
+
+(defun draw-city ()
+  (graph->png "city" *congestion-city-nodes* *congestion-city-edges*))
