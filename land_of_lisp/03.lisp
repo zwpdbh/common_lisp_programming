@@ -123,6 +123,7 @@
 		       collect (random-node))))
     (loop for n from 1 to *node-num*
        collect (append (list n)
+		       ;; Inside each cond, it is multiple (()())
 		      (cond ((eql n wumpus) '(wumpus))
 			    ((within-two n wumpus edge-alist) '(blood!)))
 		      (cond ((member n glow-worms)
