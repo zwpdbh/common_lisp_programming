@@ -1,0 +1,125 @@
+* Chapter09
+  - setf, to do generic getter
+  - makehash
+    - gethash
+  - values, return multiple values
+  - multiple-value-bind
+    - lead to more optimized and cleaner code
+  - structure
+    #+BEGIN_SRC lisp
+      (defstruct person
+        name 
+        age
+        waist-size
+        favorite-color)
+
+      (defparameter *bob* (make-person :name "bob"
+                                       :age 35
+                                       :waist-size 32
+                                       :favorite-color "blue"))
+    #+END_SRC
+
+    #+RESULTS:
+    : *BOB*
+
+** Handling Data in a Generic Way
+   - sequence functions
+*** For searching
+    - length
+    - find-if
+    - count
+    - position
+    - some
+    - every
+*** For iterating across a sequence
+    - reduce
+      #+BEGIN_SRC lisp
+        (reduce (lambda (best item)
+                  (if (and (evenp item) (> item best))
+                      item 
+                      best))
+                '(7 4 6 5 2)
+                :initial-value 0)
+      #+END_SRC
+
+      #+RESULTS:
+      : 6
+
+
+      - Specifying an initial value for the reduce function is often necessary, or a bug can sneak into your code!
+      - It is generic! It can reduce lists, arrays, or strings in exactly the same way.
+    - map
+      Similar to mapcar, but it works on all sequence types, not just lists. So You need to pass an extra parameter to specify the type of sequence to return from the mapping.
+      #+BEGIN_SRC lisp
+        (map 'array 
+             (lambda (x)
+               (if (eq x #\s)
+                   #\S
+                   x))
+             "this is a string")
+      #+END_SRC 
+
+      #+RESULTS:
+      : #(#\t #\h #\i #\S #\Space #\i #\S #\Space #\a #\Space #\S #\t #\r #\i #\n #\g)
+
+    - subseq
+      lets you pull a subsequence out of a larger sequence
+      #+begin_src lisp
+	(subseq "0123456" 1 3)
+      #+end_src
+
+      #+RESULTS:
+      : 12
+	
+    - sort
+      #+begin_src lisp
+	(sort '(10 9 7 8) #'<)
+      #+end_src
+
+      #+RESULTS:
+      | 7 | 8 | 9 | 10 |
+
+*** Creating your own generic functions with type predicates
+    - common predicates
+      - arrayp
+      - characterp
+      - consp
+      - functionp
+      - hash-table-p
+      - listp
+      - stringp
+      - symbolp
+
+    - A generic function with add number or list depend on the type
+      #+begin_src lisp
+	(defun add (a b)
+	  (cond ((and (numberp a) (numberp b))
+		 (+ a b))
+		((and (listp a) (listp b))
+		 (append a b))))
+      #+end_src
+	
+      #+begin_src lisp
+      (add 3 4)
+      #+end_src
+
+      #+RESULTS:
+      : 7
+
+      #+begin_src lisp
+	(add '(a b) '(3 4))
+      #+end_src
+
+      #+RESULTS:
+      | A | B | 3 | 4 |
+
+    - Use defmethod, do not directly predicates to do multiple case generic
+      #+begin_src lisp
+	(defmethod my-plus ((a number)
+			    (b number))
+	  (+ a b))
+
+	(defmethod my-plus ((a list)
+			    (b list))
+	  (append a b))
+      #+end_src
