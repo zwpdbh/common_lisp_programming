@@ -123,3 +123,114 @@
 			    (b list))
 	  (append a b))
       #+end_src
+      
+
+    - test
+      <el
+
+
+* Chapter10
+** loop
+   - ex01, counting from a starting point to an ending point
+     #+begin_src emacs-lisp
+       (loop for i
+	     from 5
+	     to 100
+	     sum 1)
+     #+end_src
+
+     #+RESULTS:
+     : 96
+
+   - ex02, iterating through values in a list 
+     #+begin_src emacs-lisp
+       (loop for i
+	     in '(100 1000 10000)
+	     sum i)
+     #+end_src
+
+     #+RESULTS:
+     : 11100
+
+   - ex03, doing stuff in a loop
+     #+begin_src emacs-lisp
+       (loop for i
+	     below 5
+	     do (print i))
+     #+end_src
+
+     #+RESULTS:
+
+   - ex04, doing stuff under certain conditions
+     #+begin_src emacs-lisp
+       (loop for i
+	     below 10
+	     when (oddp i)
+	     do (print i))
+     #+end_src
+
+     #+RESULTS:
+
+   - ex05, breaking out of a loop early
+     #+begin_src emacs-lisp
+       (let ((n 0))
+	 (loop for i
+	       from 0
+	       do (setf n (+ n 1))
+	       when (= i 5)
+	       return n))
+     #+end_src
+
+     #+RESULTS:
+     : 6
+
+   - ex06, collecting a list of values
+     #+begin_src emacs-lisp
+       (loop for i
+	     in '(2 3 4 5 6)
+	     collect (* i i))
+     #+end_src
+
+     #+RESULTS:
+     | 4 | 9 | 16 | 25 | 36 |
+
+   - ex07, using multiple for clauses
+     #+begin_src emacs-lisp
+       (loop for x below 10
+	     for y below 10
+	     collect (+ x y))
+     #+end_src
+
+     #+RESULTS:
+     | 0 | 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 |
+
+   - ex08, cartesian production between multiple range
+     #+begin_src emacs-lisp
+       (loop for x below 10
+	     collect (loop for y below 10
+			   collect (+ x y)))
+     #+end_src
+
+     #+RESULTS:
+     | 0 |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 |
+     | 1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 |
+     | 2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 |
+     | 3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 |
+     | 4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 | 13 |
+     | 5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 | 13 | 14 |
+     | 6 |  7 |  8 |  9 | 10 | 11 | 12 | 13 | 14 | 15 |
+     | 7 |  8 |  9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
+     | 8 |  9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 |
+     | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
+
+   - ex09, give list item 
+     #+begin_src emacs-lisp
+       (loop for i
+	     from 0
+	     for day
+	     in '(Monday Tuesday Wednesday Thursday Friday Saturday Sunday)
+	     collect (cons i day))
+     #+end_src
+
+     #+RESULTS:
+     : ((0 . Monday) (1 . Tuesday) (2 . Wednesday) (3 . Thursday) (4 . Friday) (5 . Saturday) (6 . Sunday))
