@@ -46,38 +46,38 @@
       : 6
 
 
-      - Specifying an initial value for the reduce function is often necessary, or a bug can sneak into your code!
-      - It is generic! It can reduce lists, arrays, or strings in exactly the same way.
-    - map
-      Similar to mapcar, but it works on all sequence types, not just lists. So You need to pass an extra parameter to specify the type of sequence to return from the mapping.
-      #+BEGIN_SRC lisp
-        (map 'array 
-             (lambda (x)
-               (if (eq x #\s)
-                   #\S
-                   x))
-             "this is a string")
-      #+END_SRC 
+	  - Specifying an initial value for the reduce function is often necessary, or a bug can sneak into your code!
+	  - It is generic! It can reduce lists, arrays, or strings in exactly the same way.
+	  - map
+	    Similar to mapcar, but it works on all sequence types, not just lists. So You need to pass an extra parameter to specify the type of sequence to return from the mapping.
+	    #+BEGIN_SRC lisp
+	      (map 'array 
+		   (lambda (x)
+		     (if (eq x #\s)
+			 #\S
+			 x))
+		   "this is a string")
+	    #+END_SRC 
 
-      #+RESULTS:
-      : #(#\t #\h #\i #\S #\Space #\i #\S #\Space #\a #\Space #\S #\t #\r #\i #\n #\g)
+	    #+RESULTS:
+	    : #(#\t #\h #\i #\S #\Space #\i #\S #\Space #\a #\Space #\S #\t #\r #\i #\n #\g)
 
-    - subseq
-      lets you pull a subsequence out of a larger sequence
-      #+begin_src lisp
-	(subseq "0123456" 1 3)
-      #+end_src
+	  - subseq
+	    lets you pull a subsequence out of a larger sequence
+	    #+begin_src lisp
+	      (subseq "0123456" 1 3)
+	    #+end_src
 
-      #+RESULTS:
-      : 12
-	
-    - sort
-      #+begin_src lisp
-	(sort '(10 9 7 8) #'<)
-      #+end_src
+	    #+RESULTS:
+	    : 12
 
-      #+RESULTS:
-      | 7 | 8 | 9 | 10 |
+	  - sort
+	    #+begin_src lisp
+	      (sort '(10 9 7 8) #'<)
+	    #+end_src
+
+	    #+RESULTS:
+	    | 7 | 8 | 9 | 10 |
 
 *** Creating your own generic functions with type predicates
     - common predicates
@@ -237,28 +237,28 @@
 
 * Chapter11
 ** overview
-  - ex01
-    #+begin_src lisp
-      (format t "I am printing ~,,4a in the middle of this sentence." "foo")
-    #+end_src
+   - ex01
+     #+begin_src lisp
+       (format t "I am printing ~,,4a in the middle of this sentence." "foo")
+     #+end_src
 
-    #+RESULTS:
-    : NIL
-
-
-  - ex02
-    #+begin_src lisp
-      (format t "The word ~,,4,'*a feels very important." "foo")
-    #+end_src
-
-    #+RESULTS:
-    : NIL
+     #+RESULTS:
+     : NIL
 
 
-  - ex03
-    #+begin_src lisp
-      (format t "The world ~,,4,'!@a feels very important." "foo")
-    #+end_src
+   - ex02
+     #+begin_src lisp
+       (format t "The word ~,,4,'*a feels very important." "foo")
+     #+end_src
+
+     #+RESULTS:
+     : NIL
+
+
+   - ex03
+     #+begin_src lisp
+       (format t "The world ~,,4,'!@a feels very important." "foo")
+     #+end_src
 
 
 ** Control sequences for formatting numbers
@@ -323,3 +323,59 @@
 		      (random-animal)
 		      (random-animal)))
    #+end_src
+* Chapter12 Working with Streams
+** working with files  
+   - ex01
+   #+begin_src lisp
+     (with-open-file (my-stream "data.txt" :direction :output)
+		     (print "my data" my-stream))
+   #+end_src
+
+   #+RESULTS:
+   : my data
+
+
+   - ex02
+     #+begin_src lisp
+       (with-open-file (my-stream "data.txt" :direction :input)
+	 (read my-stream))
+     #+end_src
+
+     #+RESULTS:
+     : my data
+
+
+
+* Chapter13 Let's create a web server
+** Error Handling in Common Lisp
+   - error 
+*** Creating custom conditions
+    - first define a custom condition using ~define-condition~
+      #+begin_src lisp
+	(define-condition foo () ()
+	  (:report (lambda (condition stream)
+		     (princ "Stop fooing around, numskull!!" stream))))
+      #+end_src
+
+    - Intercepting conditions
+      #+begin_src lisp
+	(defun bad-function ()
+	  (error 'foo))
+
+	(handler-case (bad-function)
+	  (foo () "someone signaled foo!")
+	  (bar () "someone singnaled bar!"))
+      #+end_src
+
+      #+RESULTS:
+      : someone signaled foo!
+
+      - The frist thing we put inside a ~handler-case~ is the piece of code that may signal conditions that we want to handle
+
+    - ~unwind-protect~
+      #+begin_src lisp
+	(unwind-protect (/ 1 0)
+	  (princ "I need to say 'flubyduby' matter what"))
+      #+end_src
+
+
