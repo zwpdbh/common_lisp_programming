@@ -234,3 +234,92 @@
 
      #+RESULTS:
      : ((0 . Monday) (1 . Tuesday) (2 . Wednesday) (3 . Thursday) (4 . Friday) (5 . Saturday) (6 . Sunday))
+
+* Chapter11
+** overview
+  - ex01
+    #+begin_src lisp
+      (format t "I am printing ~,,4a in the middle of this sentence." "foo")
+    #+end_src
+
+    #+RESULTS:
+    : NIL
+
+
+  - ex02
+    #+begin_src lisp
+      (format t "The word ~,,4,'*a feels very important." "foo")
+    #+end_src
+
+    #+RESULTS:
+    : NIL
+
+
+  - ex03
+    #+begin_src lisp
+      (format t "The world ~,,4,'!@a feels very important." "foo")
+    #+end_src
+
+
+** Control sequences for formatting numbers
+*** For integers
+    - ex01, display a number in hexadecimal (base-16) with ~x control sequences:
+      #+begin_src lisp
+	(format t "The number 1000 in hexadecimal is ~x" 1000)
+      #+end_src
+
+      #+RESULTS:
+      : NIL
+
+    - ex02, display a number in base-2
+      #+begin_src lisp
+	(format t "The number 1000 in hexadecimal is ~b" 1000)
+      #+end_src
+
+    - ex03, display a integer in base-10
+      #+begin_src lisp
+	(format t "The number 1000 in hexadecimal is ~d" 1000)
+      #+end_src
+
+      #+RESULTS:
+      : NIL
+
+    - ex04, place a colon inside the control sequence to enable commas as digit group separators.
+
+    - ex05, set the padding parameter
+
+    - ex06, change the character used for padding.
+
+*** For floating-point numbers
+    - ex01, first parameter of f, automatically round the value to fit within the requested number of characters
+    - ex02, second parameter of f, controls the number of digits displayed after the decimal point.
+    - ex03, third parameter of f, causes the number to be scale by factors of ten
+    - ex04, use control sequences ~$, which is used formatting currencies.
+
+
+** Printing multiple lines of output
+   - (terpri)
+   - (fresh-line)
+   - format has two control sequences
+     - "~%" causes a new line to be crated in all cases (like, terpri)
+     - "~&" creates new lines only as needed (like, fresh-line)
+
+** Justifying output
+   #+begin_src lisp
+     (defun random-animal ()
+       (nth (random 5) '("dog" "tick" "tiger" "walrus" "kangaroo")))
+
+     ;; place in three column at 5, 15, 25 character positions
+     (loop repeat 10
+	   do (format t "~5t~a ~15t~a ~25t~a~%"
+		      (random-animal)
+		      (random-animal)
+		      (random-animal)))
+
+     ;; all animals be spaced equally apart on a single line
+     (loop repeat 10
+	   do (format t "~30<~a~;~a~;~a~>~%"
+		      (random-animal)
+		      (random-animal)
+		      (random-animal)))
+   #+end_src
