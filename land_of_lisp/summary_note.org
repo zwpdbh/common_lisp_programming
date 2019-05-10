@@ -371,7 +371,7 @@
       : someone signaled foo!
 
       - The frist thing we put inside a ~handler-case~ is the piece of code that may signal conditions that we want to handle
-
+	
     - ~unwind-protect~
       #+begin_src lisp
 	(unwind-protect (/ 1 0)
