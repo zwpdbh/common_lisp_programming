@@ -379,3 +379,52 @@
       #+end_src
 
 
+
+* Chapter 16 Macros
+** A simple list macro 
+   - ex01
+     #+begin_src lisp
+       (defmacro let1 (var val &body body)
+	 `(let ((,var ,val))
+	    ,@body))
+     #+end_src
+
+     #+RESULTS:
+     : LET1
+
+** More complex macros
+   - suppose we need a custom my-length command 
+     #+begin_src lisp
+       (defun my-length (lst)
+	 (lables ((f (lst acc)
+		     (if lst
+			 (f (cdr lst) (1+ acc))))))
+	 (f lst 0))
+     #+end_src
+
+     #+RESULTS:
+     : MY-LENGTH
+
+   - To make the my-length more elegant, we define a split macro which is a list-eater
+     #+begin_src lisp
+       (defmacro split (val yes no)
+	 `(if ,val
+	      (let ((head (car ,val))
+		    (tail (cdr ,val)))
+		,yes)
+	      ,no))
+     #+end_src
+
+     #+RESULTS:
+     : SPLIT
+     
+   - Now, the my-length function could be rewrite
+     #+begin_src lisp
+       (defun my-length (lst)
+	 (labels ((f (lst acc)
+		    (split 
+		     lst
+		     (f tail (1+ acc))
+		     acc)))
+	   (f lst 0)))
+     #+end_src
